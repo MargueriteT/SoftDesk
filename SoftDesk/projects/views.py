@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.response import Response
 from django.views.generic.detail import SingleObjectMixin
-from rest_framework import mixins
+from rest_framework import mixins, status
 from .models import Project, Contributor, Issue, Comment
 from .serializers import ProjectsListSerializer, ProjectDetailSerializer, ContributorsListSerializer
 from .serializers import IssueDetailSerializer, ContributorDetailSerializer, IssuesListSerializer
@@ -49,19 +49,24 @@ class ProjectsViewSet(MultipleSerializerMixin, ModelViewSet):
         contributor instance for this project with the user's data
         """
 
-        project_data = request.data
-        project = Project.objects.create(title=project_data['title'],
-                                         description=project_data['description'],
-                                         type=project_data['type'],
-                                         author_id=self.request.user.id)
-        project.save()
+        serializer= ProjectDetailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author_id=self.request.user.id)
+
+        headers = self.get_success_headers(serializer.data)
+        project = Project.objects.create(title=request.data['title'],
+                         description=request.data['description'],
+                         type=request.data['type'],
+                         author_id=self.request.user.id)
+
         contributor = Contributor.objects.create(project=project,
                                                  user=self.request.user,
                                                  permission='YES',
                                                  role='AUTHOR')
         contributor.save()
-        serializer = ContributorDetailSerializer(contributor)
-        return Response(serializer.data)
+        serializer_contributor = ContributorDetailSerializer(contributor)
+        return Response(serializer_contributor.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class UsersViewSet(MultipleSerializerMixin, ModelViewSet):
     """
@@ -83,16 +88,14 @@ class UsersViewSet(MultipleSerializerMixin, ModelViewSet):
         attribute project and the contributor attribute user as the instance
         user with the id passed
         """
-        contributor_data = request.data
+        serializer = ContributorDetailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         project = Project.objects.filter(id=self.kwargs['project_pk']).first()
         user_id = request.data['user_id']
         user = User.objects.filter(id=user_id).first()
-        contributor = Contributor.objects.create(user=user,
-                                                 project=project,
-                                                 permission=contributor_data['permission'],
-                                                 role=contributor_data['role'])
-        serializer = ContributorDetailSerializer(contributor)
-        return Response(serializer.data)
+        serializer.save(user=user, project=project)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class IssuesViewSet(MultipleSerializerMixin, ModelViewSet):
@@ -116,21 +119,20 @@ class IssuesViewSet(MultipleSerializerMixin, ModelViewSet):
         Override create function to set all contributors of the project as
         assigned_user and the logged in user as the author
         """
-        issue_data = request.data
+        serializer = IssueDetailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author_user=self.request.user)
         contributors = Contributor.objects.filter(project=self.kwargs['project_pk'])
-        issue = Issue.objects.create(title=issue_data['title'],
-                                     description=issue_data['description'],
-                                     tag=issue_data['description'],
-                                     priority=issue_data['priority'],
-                                     project_id=self.kwargs['project_pk'],
-                                     status=issue_data['status'],
-                                     author_user=self.request.user)
         for contributor in contributors:
-            issue.assigned_user = contributor
-            issue.save()
+            print(contributor)
 
-        serializer = IssueDetailSerializer(issue)
-        return Response(serializer.data)
+        """for contributor in contributors:
+            serializer.save(assigned_user=contributor)
+            print(serializer.data['assigned_user'])"""
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class CommentsViewSet(MultipleSerializerMixin, ModelViewSet):
     """
@@ -155,20 +157,11 @@ class CommentsViewSet(MultipleSerializerMixin, ModelViewSet):
         Override create function to set comment attribute issue as the
         specific issue he is looking and the logged in user as the author
         """
-        comment_data = request.data
+        serializer = CommentDetailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         issue = Issue.objects.filter(pk=self.kwargs['issue_pk']).first()
-        comment = Comment.objects.create(description=comment_data['description'],
-                                         author_user=self.request.user,
-                                         issue=issue)
-
-        comment.save()
-        print(comment)
-        serializer = CommentDetailSerializer(comment)
-
-        return Response(serializer.data)
-
-
-
-
+        serializer.save(author_user=self.request.user, issue=issue)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 

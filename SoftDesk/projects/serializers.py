@@ -151,7 +151,7 @@ class IssueDetailSerializer(serializers.ModelSerializer):
 
     def get_assigned_user(self, instance):
         queryset = instance.assigned_user
-        serializer = AssignedUserSerializer(queryset, many=False)
+        serializer = AssignedUserSerializer(queryset, many=True)
         return serializer.data
 
 
