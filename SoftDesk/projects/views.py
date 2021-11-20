@@ -119,16 +119,14 @@ class IssuesViewSet(MultipleSerializerMixin, ModelViewSet):
         Override create function to set all contributors of the project as
         assigned_user and the logged in user as the author
         """
+
+        project = Project.objects.filter(id=self.kwargs['project_pk']).first()
+        user = User.objects.filter(id=project.author_id).first()
+        author = Contributor.objects.filter(user=user).first()
         serializer = IssueDetailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(author_user=self.request.user)
-        contributors = Contributor.objects.filter(project=self.kwargs['project_pk'])
-        for contributor in contributors:
-            print(contributor)
+        serializer.save(author_user=self.request.user,assigned_user=author)
 
-        """for contributor in contributors:
-            serializer.save(assigned_user=contributor)
-            print(serializer.data['assigned_user'])"""
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
