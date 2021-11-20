@@ -22,6 +22,8 @@ First, make sure you already have python3 install on your computer. If not, plea
     Navigate to the SoftDesk folder : cd SoftDesk
     Run the program: python manage.py runserver
 
+In the SoftDesk application, create a configuration.py file from which the
+ SECRET_KEY will be imported.
 
 ## **SoftDesk API**
 
@@ -211,7 +213,9 @@ The user must provide the following keys :
 - priority,
 - project_id,
 - status.
-
+Author_user is set to the logged in user. Assigned_user is the author of the
+ project.
+ 
 
     sucessful request : http status 200
     no token : http status 401
