@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from .models import Contributor, Project, Issue
 
 
 class IsOwnerProjectOrReadOnly(permissions.BasePermission):
@@ -28,7 +27,7 @@ class IsOwnerIssueOrCommentOrReadOnly(permissions.BasePermission):
         """"
         Any authenticated user can create a new issue or comment.
         An user can update or delete an issue or a comment only if he is the
-        author of the issue/ comment
+        author of the issue/ comment.
         """
         if request.method in permissions.SAFE_METHODS:
             return True
