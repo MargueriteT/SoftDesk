@@ -1,4 +1,4 @@
-![LitReview](SOftDesk/SoftDeskPreview.jpg)
+![SOftDesk](SoftDesk/SoftDeskPreview.jpg)
 
 # SOFT DESK REST API 
 
@@ -53,8 +53,8 @@ API endpoint to register a new user Five keys must be provided in the body :
 - password.
 
    
-       successful request : http status 201 
-       missing key or already exists : http status 400 
+      successful request : http status 201 
+      missing key or already exists : http status 400 
 
 ### Login
 
@@ -65,9 +65,9 @@ API endpoint to log in. Two key must be passed in the body :
 - password.
 
    
-      successful request : http status 200 
-      account doesn't exist or password error : http status 401
-      missing field : http status 400
+     successful request : http status 200 
+     account doesn't exist or password error : http status 401
+     missing field : http status 400
 
 ### Projects list
 
