@@ -125,7 +125,7 @@ class IssuesViewSet(MultipleSerializerMixin, ModelViewSet):
         author = Contributor.objects.filter(user=user).first()
         serializer = IssueDetailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(author_user=self.request.user,assigned_user=author)
+        serializer.save(author_user=self.request.user,assigned_user=author, project_id=project.id)
 
 
         headers = self.get_success_headers(serializer.data)
