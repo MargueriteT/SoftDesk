@@ -11,7 +11,9 @@ This API is used for an application that tracks issues on web site and
 
 ## **Clone the repository**
 
-Download the repository from this link to the local folder you want: https://github.com/MargueriteT/SoftDesk.git
+Download the repository from this link to the local folder you want: 
+
+``git clone https://github.com/MargueriteT/SoftDesk.git``
 
 ## **Installation**
 
@@ -29,13 +31,15 @@ Activate this virtual environment: ``env\Scripts\activate (windows) ou source en
 
 Install project dependencies: ``pip install -r requirements.txt``
 
-Navigate to SoftDesk app : ``cd SoftDesk``
+Navigate to SoftDesk app : ``cd SoftDesk/SoftDesk``
 
 Create a new python file named configuration.py : ``copy con configuration.py``
 
 Add the secret key to the file : ``SECRET_KEY = 'yoursecretkey'``
 
 Go back to the SoftDesk folder : ``cd ..``
+
+Create the database : ``python manage.py migrate``
 
 Run the program: ``python manage.py runserver``
 
